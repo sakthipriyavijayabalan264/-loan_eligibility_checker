@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LoanCheck – Instant Eligibility</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   LoanCheck – Design System
+   Palette: deep navy + electric indigo + semantic green/red
+   Type: Sora (display) + Inter (body/UI)
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --navy:         #0B1220;
+  --navy-mid:     #121E33;
+  --navy-soft:    #1A2B45;
+  --border:       #243352;
+  --indigo:       #4F6EF7;
+  --indigo-lit:   #6B87FF;
+  --indigo-glow:  rgba(79,110,247,.18);
+  --green:        #22C55E;
+  --green-bg:     rgba(34,197,94,.10);
+  --red:          #F43F5E;
+  --red-bg:       rgba(244,63,94,.10);
+  --amber:        #F59E0B;
+  --text-primary:  #E8EDF8;
+  --text-secondary:#8DA0C0;
+  --text-muted:    #5A7099;
+  --card-bg:      #111C30;
+  --card-border:  #1F3050;
+  --radius:       12px;
+  --radius-lg:    18px;
+  --shadow:       0 4px 24px rgba(0,0,0,.45);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--navy);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3 { font-family: 'Sora', sans-serif; }
+
+/* ── PAGE SWITCHER ──────────────────────────────────────────── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── CUSTOMER PAGE ──────────────────────────────────────────── */
+.customer-page { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* Hero */
+.hero {
+  position: relative; overflow: hidden;
+  padding: 3rem 2rem 4rem;
+  background: linear-gradient(135deg, var(--navy-mid) 0%, #0D1B35 100%);
+  border-bottom: 1px solid var(--border);
+}
+.hero-inner { max-width: 820px; margin: 0 auto; position: relative; z-index: 1; }
+.hero-brand {
+  display: flex; align-items: center; gap: .6rem;
+  margin-bottom: 2.4rem;
+}
+.brand-mark { color: var(--indigo); font-size: 1.1rem; }
+.brand-name { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: -.02em; }
+.admin-link {
+  margin-left: auto;
+  color: var(--indigo); text-decoration: none;
+  font-size: .85rem; font-weight: 500; opacity: .8; transition: opacity .2s;
+}
+.admin-link:hover { opacity: 1; }
+.hero-headline {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800; line-height: 1.15; letter-spacing: -.03em;
+}
+.hero-headline em { font-style: normal; color: var(--indigo-lit); }
+.hero-sub {
+  margin-top: 1rem; font-size: 1rem;
+  color: var(--text-secondary); max-width: 480px; line-height: 1.6;
+}
+.hero-bg-grid {
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px; opacity: .35;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.8) 60%, transparent 100%);
+}
+
+/* Form section */
+.form-section { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; width: 100%; }
+.form-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg); padding: 2.4rem; box-shadow: var(--shadow);
+}
+.form-section-label {
+  font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--indigo);
+  margin: 2rem 0 1.1rem;
+}
+.form-section-label:first-child { margin-top: 0; }
+.form-grid { display: grid; gap: 1.2rem; }
+.two-col   { grid-template-columns: repeat(2, 1fr); }
+.three-col { grid-template-columns: repeat(3, 1fr); }
+.two-col-span { grid-column: 1 / -1; }
+@media (max-width: 640px) {
+  .two-col, .three-col { grid-template-columns: 1fr; }
+  .two-col-span { grid-column: 1; }
+}
+.field { display: flex; flex-direction: column; gap: .45rem; }
+label { font-size: .82rem; font-weight: 500; color: var(--text-secondary); letter-spacing: .01em; }
+input, select {
+  background: var(--navy-soft); border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--text-primary);
+  font-family: 'Inter', sans-serif; font-size: .95rem;
+  padding: .7rem 1rem; outline: none; width: 100%; appearance: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238DA0C0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem;
+}
+input::placeholder { color: var(--text-muted); }
+input:focus, select:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-glow); }
+input.invalid, select.invalid { border-color: var(--red); box-shadow: 0 0 0 3px rgba(244,63,94,.12); }
+.err { font-size: .76rem; color: var(--red); min-height: 1rem; display: block; }
+
+/* Credit score bar */
+.score-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 2px; }
+.score-bar { height: 100%; border-radius: 2px; transition: width .4s ease, background-color .4s; width: 0; }
+
+/* Submit button */
+.submit-btn {
+  margin-top: 2rem; width: 100%; padding: .95rem;
+  background: var(--indigo); border: none; border-radius: 10px;
+  color: #fff; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600;
+  cursor: pointer; transition: background .2s, transform .15s, box-shadow .2s;
+  display: flex; align-items: center; justify-content: center; gap: .6rem;
+  box-shadow: 0 4px 18px rgba(79,110,247,.35);
+}
+.submit-btn:hover { background: var(--indigo-lit); box-shadow: 0 6px 24px rgba(79,110,247,.5); }
+.submit-btn:active { transform: translateY(1px); }
+.submit-btn:disabled { opacity: .6; cursor: not-allowed; }
+.btn-loader {
+  width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.3);
+  border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Result panel */
+.result-panel {
+  margin-top: 2rem; background: var(--card-bg);
+  border: 1px solid var(--card-border); border-radius: var(--radius-lg);
+  padding: 2.5rem; text-align: center;
+  animation: fadeUp .4s ease; box-shadow: var(--shadow);
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.result-icon { font-size: 3rem; margin-bottom: .8rem; }
+.result-badge {
+  display: inline-block; font-size: .75rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: .3rem .9rem; border-radius: 20px; margin-bottom: 1rem;
+}
+.result-badge.eligible     { background: var(--green-bg); color: var(--green); }
+.result-badge.not-eligible { background: var(--red-bg);   color: var(--red);   }
+.result-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: .8rem; }
+.result-meta {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem;
+  margin: 1.2rem 0; font-size: .88rem; color: var(--text-secondary);
+}
+.result-meta span strong { color: var(--text-primary); display: block; font-size: 1rem; }
+.result-reasons {
+  text-align: left; background: var(--red-bg);
+  border: 1px solid rgba(244,63,94,.2); border-radius: var(--radius);
+  padding: 1.2rem 1.4rem; margin: 1.2rem 0; list-style: none;
+}
+.result-reasons li {
+  font-size: .88rem; color: #FDA0AE; padding: .3rem 0;
+  padding-left: 1.2rem; position: relative;
+}
+.result-reasons li::before { content: '✕'; position: absolute; left: 0; color: var(--red); font-size: .75rem; }
+.reset-btn {
+  margin-top: 1.5rem; padding: .65rem 2rem;
+  background: transparent; border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--text-secondary);
+  font-family: 'Inter', sans-serif; font-size: .9rem;
+  cursor: pointer; transition: border-color .2s, color .2s;
+}
+.reset-btn:hover { border-color: var(--indigo); color: var(--indigo); }
+.hidden { display: none !important; }
+.site-footer {
+  text-align: center; padding: 2rem; font-size: .78rem;
+  color: var(--text-muted); border-top: 1px solid var(--border); margin-top: auto;
+}
+
+/* ── ADMIN PAGE ─────────────────────────────────────────────── */
+.admin-layout { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--navy-mid); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 1.8rem 1.2rem; position: sticky; top: 0; height: 100vh;
+}
+.sidebar-brand { display: flex; align-items: center; gap: .5rem; margin-bottom: 2.5rem; }
+.sidebar-nav { display: flex; flex-direction: column; gap: .3rem; flex: 1; }
+.nav-item {
+  display: block; padding: .65rem 1rem; border-radius: 8px;
+  color: var(--text-secondary); text-decoration: none;
+  font-size: .9rem; font-weight: 500; transition: background .2s, color .2s;
+  cursor: pointer; border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover  { background: var(--navy-soft); color: var(--text-primary); }
+.nav-item.active { background: rgba(79,110,247,.18); color: var(--indigo-lit); }
+.sidebar-back {
+  font-size: .8rem; color: var(--text-muted); background: none; border: none;
+  cursor: pointer; margin-top: auto; padding: .5rem 0; transition: color .2s; text-align: left;
+}
+.sidebar-back:hover { color: var(--indigo); }
+.admin-content { flex: 1; padding: 2.5rem; overflow-y: auto; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.panel-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 1.8rem; }
+
+/* Stats */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.2rem; margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: var(--radius); padding: 1.4rem 1.6rem;
+}
+.stat-card.green { border-color: rgba(34,197,94,.25); }
+.stat-card.red   { border-color: rgba(244,63,94,.25); }
+.stat-card.blue  { border-color: rgba(79,110,247,.25); }
+.stat-num { font-family: 'Sora', sans-serif; font-size: 2.2rem; font-weight: 800; line-height: 1; }
+.stat-card.green .stat-num { color: var(--green); }
+.stat-card.red   .stat-num { color: var(--red);   }
+.stat-card.blue  .stat-num { color: var(--indigo); }
+.stat-label { font-size: .78rem; color: var(--text-muted); margin-top: .4rem; font-weight: 500; }
+
+/* Bar chart */
+.chart-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: var(--radius); padding: 1.5rem;
+}
+.chart-label { font-size: .78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1.2rem; }
+.bar-chart { display: flex; flex-direction: column; gap: .75rem; }
+.bar-row { display: flex; align-items: center; gap: .8rem; font-size: .82rem; }
+.bar-row-label { width: 120px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { flex: 1; height: 10px; background: var(--navy-soft); border-radius: 5px; overflow: hidden; }
+.bar-fill  { height: 100%; background: var(--indigo); border-radius: 5px; transition: width .6s ease; }
+.bar-count { color: var(--text-muted); width: 28px; text-align: right; }
+
+/* Records toolbar */
+.records-toolbar { display: flex; gap: .8rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+.search-input {
+  flex: 1; min-width: 200px;
+  background: var(--card-bg); border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--text-primary);
+  font-family: 'Inter', sans-serif; font-size: .9rem;
+  padding: .6rem 1rem; outline: none; transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--indigo); }
+.toolbar-btn {
+  padding: .6rem 1.2rem; border-radius: 8px;
+  font-family: 'Inter', sans-serif; font-size: .88rem; font-weight: 500;
+  cursor: pointer; border: 1.5px solid var(--border);
+  background: transparent; color: var(--text-secondary); transition: all .2s;
+}
+.toolbar-btn:hover   { border-color: var(--indigo); color: var(--indigo); }
+.toolbar-btn.primary { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+.toolbar-btn.primary:hover { background: var(--indigo-lit); }
+
+/* Table */
+.table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--card-border); }
+.records-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.records-table thead { background: var(--navy-soft); }
+.records-table th {
+  padding: .9rem 1rem; text-align: left;
+  font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
+}
+.records-table td {
+  padding: .85rem 1rem; border-top: 1px solid var(--border);
+  color: var(--text-secondary); white-space: nowrap;
+}
+.records-table tr:hover td { background: rgba(79,110,247,.04); }
+.loading-cell { text-align: center; color: var(--text-muted); padding: 2.5rem !important; }
+.badge {
+  display: inline-block; font-size: .7rem; font-weight: 700;
+  padding: .2rem .65rem; border-radius: 12px; letter-spacing: .06em;
+}
+.badge.eligible     { background: var(--green-bg); color: var(--green); }
+.badge.not-eligible { background: var(--red-bg);   color: var(--red);   }
+
+/* Criteria */
+.criteria-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg); padding: 2rem; max-width: 700px;
+}
+.criteria-msg {
+  margin-top: 1rem; padding: .75rem 1rem;
+  border-radius: 8px; font-size: .88rem; font-weight: 500;
+}
+.criteria-msg.success { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,.2); }
+.criteria-msg.error   { background: var(--red-bg);   color: var(--red);   border: 1px solid rgba(244,63,94,.2); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CUSTOMER PAGE
+══════════════════════════════════════════════════════════════ -->
+<div id="page-customer" class="page active">
+  <div class="customer-page">
+
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="hero-brand">
+          <span class="brand-mark">●</span>
+          <span class="brand-name">LoanCheck</span>
+          <button class="admin-link" onclick="showPage('admin')">Admin →</button>
+        </div>
+        <h1 class="hero-headline">Know your loan<br><em>eligibility in seconds.</em></h1>
+        <p class="hero-sub">Fill in your financial details below. We'll run the numbers instantly — no hidden catches.</p>
+      </div>
+      <div class="hero-bg-grid"></div>
+    </header>
+
+    <main class="form-section">
+      <div class="form-card" id="formCard">
+        <form id="eligibilityForm" novalidate>
+
+          <div class="form-section-label">Personal Information</div>
+          <div class="form-grid two-col">
+            <div class="field">
+              <label for="name">Full Name</label>
+              <input type="text" id="name" placeholder="Aisha Krishnamurthy" required/>
+              <span class="err" id="err-name"></span>
+            </div>
+            <div class="field">
+              <label for="mobile">Mobile Number</label>
+              <input type="tel" id="mobile" placeholder="9876543210" required/>
+              <span class="err" id="err-mobile"></span>
+            </div>
+            <div class="field two-col-span">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" placeholder="aisha@example.com" required/>
+              <span class="err" id="err-email"></span>
+            </div>
+          </div>
+
+          <div class="form-section-label">Loan Details</div>
+          <div class="form-grid two-col">
+            <div class="field">
+              <label for="loan_type">Loan Type</label>
+              <select id="loan_type" required>
+                <option value="">— Select —</option>
+                <option>Home Loan</option>
+                <option>Personal Loan</option>
+                <option>Car Loan</option>
+                <option>Education Loan</option>
+                <option>Business Loan</option>
+              </select>
+              <span class="err" id="err-loan_type"></span>
+            </div>
+            <div class="field">
+              <label for="employment_type">Employment Type</label>
+              <select id="employment_type" required>
+                <option value="">— Select —</option>
+                <option>Salaried</option>
+                <option>Self-Employed</option>
+                <option>Business Owner</option>
+                <option>Freelancer</option>
+              </select>
+              <span class="err" id="err-employment_type"></span>
+            </div>
+            <div class="field">
+              <label for="requested_amount">Loan Amount Required (₹)</label>
+              <input type="number" id="requested_amount" placeholder="500000" min="1000" required/>
+              <span class="err" id="err-requested_amount"></span>
+            </div>
+            <div class="field">
+              <label for="tenure_months">Loan Tenure (months)</label>
+              <input type="number" id="tenure_months" placeholder="60" min="6" max="360" required/>
+              <span class="err" id="err-tenure_months"></span>
+            </div>
+          </div>
+
+          <div class="form-section-label">Financial Profile</div>
+          <div class="form-grid three-col">
+            <div class="field">
+              <label for="monthly_income">Monthly Income (₹)</label>
+              <input type="number" id="monthly_income" placeholder="50000" min="0" required/>
+              <span class="err" id="err-monthly_income"></span>
+            </div>
+            <div class="field">
+              <label for="credit_score">Credit Score</label>
+              <input type="number" id="credit_score" placeholder="750" min="300" max="900" required/>
+              <span class="score-bar-wrap"><div class="score-bar" id="scoreBar"></div></span>
+              <span class="err" id="err-credit_score"></span>
+            </div>
+            <div class="field">
+              <label for="existing_emi">Existing EMI / month (₹)</label>
+              <input type="number" id="existing_emi" placeholder="5000" min="0" required/>
+              <span class="err" id="err-existing_emi"></span>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span class="btn-text">Check Eligibility</span>
+            <span class="btn-loader hidden"></span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Result Panel -->
+      <div id="resultPanel" class="result-panel hidden">
+        <div class="result-icon" id="resultIcon"></div>
+        <div class="result-badge" id="resultBadge"></div>
+        <h2 class="result-title" id="resultTitle"></h2>
+        <div class="result-meta" id="resultMeta"></div>
+        <ul class="result-reasons hidden" id="resultReasons"></ul>
+        <button class="reset-btn" onclick="resetForm()">Check Again</button>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2025 LoanCheck · Results are indicative and subject to bank approval.</p>
+    </footer>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ADMIN PAGE
+══════════════════════════════════════════════════════════════ -->
+<div id="page-admin" class="page">
+  <div class="admin-layout">
+
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-mark">●</span>
+        <span class="brand-name">LoanCheck</span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="switchTab('dashboard', this)">Dashboard</button>
+        <button class="nav-item" onclick="switchTab('records', this)">All Records</button>
+        <button class="nav-item" onclick="switchTab('criteria', this)">Criteria Settings</button>
+      </nav>
+      <button class="sidebar-back" onclick="showPage('customer')">← Customer Form</button>
+    </aside>
+
+    <div class="admin-content">
+
+      <!-- Dashboard Tab -->
+      <section class="tab-panel active" id="tab-dashboard">
+        <h2 class="panel-title">Overview</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="statTotal">—</div>
+            <div class="stat-label">Total Checks</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-num" id="statEligible">—</div>
+            <div class="stat-label">Eligible</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-num" id="statNotEligible">—</div>
+            <div class="stat-label">Not Eligible</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-num" id="statRate">—</div>
+            <div class="stat-label">Approval Rate</div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-label">Checks by Loan Type</div>
+          <div id="loanTypeChart" class="bar-chart"></div>
+        </div>
+      </section>
+
+      <!-- Records Tab -->
+      <section class="tab-panel" id="tab-records">
+        <h2 class="panel-title">All Eligibility Records</h2>
+        <div class="records-toolbar">
+          <input type="text" id="searchInput" placeholder="Search by name or mobile…" class="search-input"/>
+          <button class="toolbar-btn primary" onclick="loadRecords()">Search</button>
+          <button class="toolbar-btn" onclick="exportRecords()">Export CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table class="records-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Name</th><th>Mobile</th><th>Loan Type</th>
+                <th>Income</th><th>Credit</th><th>Amt Requested</th>
+                <th>EMI</th><th>EMI Ratio</th><th>Result</th><th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody">
+              <tr><td colspan="11" class="loading-cell">Click Search to load records.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Criteria Tab -->
+      <section class="tab-panel" id="tab-criteria">
+        <h2 class="panel-title">Eligibility Criteria</h2>
+        <div class="criteria-card">
+          <form id="criteriaForm">
+            <div class="form-section-label">Core Thresholds</div>
+            <div class="form-grid two-col">
+              <div class="field">
+                <label>Minimum Monthly Income (₹)</label>
+                <input type="number" id="c_min_income" min="0"/>
+              </div>
+              <div class="field">
+                <label>Minimum Credit Score</label>
+                <input type="number" id="c_min_credit" min="300" max="900"/>
+              </div>
+              <div class="field">
+                <label>Max EMI-to-Income Ratio (%)</label>
+                <input type="number" id="c_max_emi_ratio" min="1" max="100"/>
+              </div>
+            </div>
+            <div class="form-section-label">Loan Limits (₹)</div>
+            <div class="form-grid two-col" id="loanLimitsGrid"></div>
+            <button type="submit" class="submit-btn">Save Criteria</button>
+            <div id="criteriaMsg" class="criteria-msg hidden"></div>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   PAGE SWITCHER
+══════════════════════════════════════════════════════════════ */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (name === 'admin') loadStats();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CUSTOMER LOGIC
+══════════════════════════════════════════════════════════════ */
+const scoreInput = document.getElementById('credit_score');
+const scoreBar   = document.getElementById('scoreBar');
+
+scoreInput.addEventListener('input', () => {
+  const v = parseInt(scoreInput.value) || 0;
+  const pct = Math.min(Math.max((v - 300) / 600, 0), 1) * 100;
+  scoreBar.style.width = pct + '%';
+  scoreBar.style.background = v >= 750 ? '#22C55E' : v >= 700 ? '#F59E0B' : '#F43F5E';
+});
+
+const rules = {
+  name:             v => /^[A-Za-z\s]{2,}$/.test(v.trim())        ? '' : 'Enter a valid full name.',
+  mobile:           v => /^[6-9]\d{9}$/.test(v.trim())            ? '' : 'Enter a valid 10-digit Indian mobile number.',
+  email:            v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)     ? '' : 'Enter a valid email address.',
+  loan_type:        v => v                                         ? '' : 'Select a loan type.',
+  employment_type:  v => v                                         ? '' : 'Select an employment type.',
+  monthly_income:   v => +v >= 1                                   ? '' : 'Enter your monthly income.',
+  credit_score:     v => +v >= 300 && +v <= 900                    ? '' : 'Credit score must be 300–900.',
+  existing_emi:     v => +v >= 0                                   ? '' : 'Enter 0 if no existing EMIs.',
+  requested_amount: v => +v >= 1000                                ? '' : 'Minimum loan amount is ₹1,000.',
+  tenure_months:    v => +v >= 6 && +v <= 360                      ? '' : 'Tenure must be 6–360 months.',
+};
+
+function showErr(id, msg) {
+  const errEl = document.getElementById('err-' + id);
+  if (errEl) errEl.textContent = msg;
+  const inp = document.getElementById(id);
+  if (inp) inp.classList.toggle('invalid', !!msg);
+}
+
+function validateAll() {
+  let ok = true;
+  for (const [id, fn] of Object.entries(rules)) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const msg = fn(el.value);
+    showErr(id, msg);
+    if (msg) ok = false;
+  }
+  return ok;
+}
+
+for (const id of Object.keys(rules)) {
+  const el = document.getElementById(id);
+  if (!el) continue;
+  el.addEventListener('blur',  () => showErr(id, rules[id](el.value)));
+  el.addEventListener('input', () => { if (el.classList.contains('invalid')) showErr(id, rules[id](el.value)); });
+}
+
+document.getElementById('eligibilityForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!validateAll()) return;
+
+  const btn    = document.getElementById('submitBtn');
+  const btnTxt = btn.querySelector('.btn-text');
+  const loader = btn.querySelector('.btn-loader');
+  btn.disabled = true; btnTxt.classList.add('hidden'); loader.classList.remove('hidden');
+
+  const payload = {
+    name:             document.getElementById('name').value.trim(),
+    mobile:           document.getElementById('mobile').value.trim(),
+    email:            document.getElementById('email').value.trim(),
+    loan_type:        document.getElementById('loan_type').value,
+    employment_type:  document.getElementById('employment_type').value,
+    monthly_income:   document.getElementById('monthly_income').value,
+    credit_score:     document.getElementById('credit_score').value,
+    existing_emi:     document.getElementById('existing_emi').value,
+    requested_amount: document.getElementById('requested_amount').value,
+    tenure_months:    document.getElementById('tenure_months').value,
+  };
+
+  try {
+    const res  = await fetch('/api/check-eligibility', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    showResult(data, payload);
+  } catch (err) {
+    alert('Something went wrong: ' + err.message);
+  } finally {
+    btn.disabled = false; btnTxt.classList.remove('hidden'); loader.classList.add('hidden');
+  }
+});
+
+function showResult(data, payload) {
+  const eligible = data.result === 'Eligible';
+  document.getElementById('resultIcon').textContent  = eligible ? '🎉' : '⚠️';
+  document.getElementById('resultBadge').textContent = data.result;
+  document.getElementById('resultBadge').className   = 'result-badge ' + (eligible ? 'eligible' : 'not-eligible');
+  document.getElementById('resultTitle').textContent = eligible
+    ? `Great news, ${payload.name.split(' ')[0]}! You're eligible.`
+    : `Sorry, you don't qualify right now.`;
+  document.getElementById('resultMeta').innerHTML = `
+    <span><strong>₹${fmtNum(data.calculated_emi)}</strong>Est. Monthly EMI</span>
+    <span><strong>₹${fmtNum(data.total_emi)}</strong>Total EMI Burden</span>
+    <span><strong>${data.emi_ratio_pct}%</strong>EMI-to-Income Ratio</span>
+    <span><strong>#${data.check_id}</strong>Reference ID</span>
+  `;
+  const rList = document.getElementById('resultReasons');
+  if (!eligible && data.reasons.length) {
+    rList.innerHTML = data.reasons.map(r => `<li>${r}</li>`).join('');
+    rList.classList.remove('hidden');
+  } else {
+    rList.classList.add('hidden');
+  }
+  document.getElementById('formCard').style.display = 'none';
+  const panel = document.getElementById('resultPanel');
+  panel.classList.remove('hidden');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetForm() {
+  document.getElementById('eligibilityForm').reset();
+  scoreBar.style.width = '0';
+  document.getElementById('resultPanel').classList.add('hidden');
+  document.getElementById('formCard').style.display = '';
+  document.querySelectorAll('.err').forEach(el => el.textContent = '');
+  document.querySelectorAll('input,select').forEach(el => el.classList.remove('invalid'));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ADMIN LOGIC
+══════════════════════════════════════════════════════════════ */
+function switchTab(name, btn) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'dashboard') loadStats();
+  if (name === 'records')   loadRecords();
+  if (name === 'criteria')  loadCriteria();
+}
+
+async function loadStats() {
+  try {
+    const res  = await fetch('/api/stats');
+    const data = await res.json();
+    const s    = data.summary;
+    document.getElementById('statTotal').textContent       = s.total       ?? '0';
+    document.getElementById('statEligible').textContent    = s.eligible    ?? '0';
+    document.getElementById('statNotEligible').textContent = s.not_eligible ?? '0';
+    const rate = s.total > 0 ? Math.round((s.eligible / s.total) * 100) : 0;
+    document.getElementById('statRate').textContent        = rate + '%';
+    renderBarChart(data.by_type);
+  } catch (err) { console.error('Stats error:', err); }
+}
+
+function renderBarChart(items) {
+  const el = document.getElementById('loanTypeChart');
+  if (!items || !items.length) { el.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">No data yet.</p>'; return; }
+  const max = Math.max(...items.map(i => i.cnt));
+  el.innerHTML = items.map(i => `
+    <div class="bar-row">
+      <span class="bar-row-label" title="${esc(i.loan_type)}">${esc(i.loan_type)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${(i.cnt/max*100).toFixed(1)}%"></div></div>
+      <span class="bar-count">${i.cnt}</span>
+    </div>`).join('');
+}
+
+async function loadRecords() {
+  const search = (document.getElementById('searchInput')?.value || '').trim();
+  const tbody  = document.getElementById('recordsBody');
+  tbody.innerHTML = '<tr><td colspan="11" class="loading-cell">Loading…</td></tr>';
+  try {
+    const res  = await fetch('/api/records?search=' + encodeURIComponent(search));
+    const rows = await res.json();
+    if (!rows.length) { tbody.innerHTML = '<tr><td colspan="11" class="loading-cell">No records found.</td></tr>'; return; }
+    tbody.innerHTML = rows.map((r, i) => `
+      <tr>
+        <td style="color:var(--text-muted)">${i+1}</td>
+        <td style="color:var(--text-primary);font-weight:500">${esc(r.name)}</td>
+        <td>${esc(r.mobile)}</td>
+        <td>${esc(r.loan_type)}</td>
+        <td>₹${fmtNum(r.monthly_income)}</td>
+        <td>${r.credit_score}</td>
+        <td>₹${fmtNum(r.requested_amount)}</td>
+        <td>₹${fmtNum(r.calculated_emi)}</td>
+        <td>${(r.emi_ratio*100).toFixed(1)}%</td>
+        <td><span class="badge ${r.result==='Eligible'?'eligible':'not-eligible'}">${esc(r.result)}</span></td>
+        <td style="color:var(--text-muted)">${esc(r.checked_at)}</td>
+      </tr>
+      ${r.rejection_reasons ? `<tr><td colspan="11" style="padding:.3rem 1rem .9rem;font-size:.78rem;color:#FDA0AE;background:rgba(244,63,94,.03)">✕ ${esc(r.rejection_reasons)}</td></tr>` : ''}`
+    ).join('');
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="11" class="loading-cell" style="color:var(--red)">Error: ${err.message}</td></tr>`;
+  }
+}
+
+document.getElementById('searchInput')?.addEventListener('keydown', e => { if (e.key==='Enter') loadRecords(); });
+
+function exportRecords() {
+  const search = (document.getElementById('searchInput')?.value || '').trim();
+  window.location.href = '/api/export?search=' + encodeURIComponent(search);
+}
+
+async function loadCriteria() {
+  try {
+    const res  = await fetch('/api/criteria');
+    const data = await res.json();
+    document.getElementById('c_min_income').value    = data.min_income;
+    document.getElementById('c_min_credit').value    = data.min_credit_score;
+    document.getElementById('c_max_emi_ratio').value = Math.round(data.max_emi_ratio * 100);
+    const grid = document.getElementById('loanLimitsGrid');
+    grid.innerHTML = Object.entries(data.loan_limits).map(([type, limit]) => `
+      <div class="field">
+        <label>${esc(type)} Limit (₹)</label>
+        <input type="number" data-loan-type="${esc(type)}" class="loan-limit-input" value="${limit}" min="0"/>
+      </div>`).join('');
+  } catch (err) { console.error('Criteria load error:', err); }
+}
+
+document.getElementById('criteriaForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const limits = {};
+  document.querySelectorAll('.loan-limit-input').forEach(inp => { limits[inp.dataset.loanType] = parseFloat(inp.value); });
+  const payload = {
+    min_income:       parseFloat(document.getElementById('c_min_income').value),
+    min_credit_score: parseInt(document.getElementById('c_min_credit').value),
+    max_emi_ratio:    parseFloat(document.getElementById('c_max_emi_ratio').value) / 100,
+    loan_limits:      limits,
+  };
+  const msg = document.getElementById('criteriaMsg');
+  try {
+    await fetch('/api/criteria', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    msg.className = 'criteria-msg success'; msg.textContent = '✓ Criteria updated successfully.';
+  } catch (err) {
+    msg.className = 'criteria-msg error'; msg.textContent = '✕ Update failed: ' + err.message;
+  }
+  msg.classList.remove('hidden');
+  setTimeout(() => msg.classList.add('hidden'), 4000);
+});
+
+/* ── Helpers ─────────────────────────────────────────────────── */
+function fmtNum(n) { return Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 }); }
+function esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
